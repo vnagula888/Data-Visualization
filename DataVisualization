@@ -62,8 +62,10 @@ public class PieChart extends JFrame
 
         int benignCount = 0;
         int malignantCount = 0;
-
-        String zipFilePath = "C:\\Users\\Vrinda\\Downloads\\breast+cancer+wisconsin+original.zip";
+        /** Download the dataset from this website: https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic
+         *  Make sure to zip it and copy the file path. 
+         *  Replace the file path inside the quotes. 
+        String zipFilePath = "zipped file path";
 
         // Opens the ZIP file specified by zipFilePath in a try-with-resources block to ensure it is closed automatically.
         try (ZipFile zipFile = new ZipFile(zipFilePath)) 
