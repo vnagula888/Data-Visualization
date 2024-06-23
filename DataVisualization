@@ -1,0 +1,154 @@
+/**
+ * Name: Vrinda Nagula
+ * Date: 05/12/2024
+ * Purpose: Display whether a tumour is benign or malignant in a pie chart. 
+ */
+
+// These lines import necessary classes for creating charts, reading files, handling I/O operations, and creating the GUI.
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.general.DefaultPieDataset;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+// PieChartExample class extends JFrame to create a window.
+public class PieChart extends JFrame 
+{
+
+    public PieChart(String title) 
+    {
+    	// The constructor takes a title parameter and passes it to the JFrame constructor.
+        super(title); 
+
+        // Calls createDataset method to generate data for the pie chart.
+        DefaultPieDataset dataset = createDataset();
+
+        // Create chart
+        JFreeChart chart = ChartFactory.createPieChart(
+                "Tumour Classification",    // Chart title
+                dataset,                    // Contains the data to be displayed in the pie chart("Benign" and "Malignant") and their corresponding values
+                true,                       // Include legend
+                true,                       // This boolean parameter specifies whether to generate tooltips for the chart. 
+                false                       // This boolean parameter specifies whether to generate URLs for the chart.
+        );
+
+        // The getPlot() method returns a generic Plot object, which is the base class for different types of plots in JFreeChart.
+        // The cast (PiePlot) is used to tell the Java compiler to treat the returned Plot object specifically as a PiePlot object.
+        PiePlot plot = (PiePlot) chart.getPlot();
+        plot.setSectionPaint("Benign", new Color(0, 255, 0));  // Green for benign
+        plot.setSectionPaint("Malignant", new Color(255, 0, 0)); // Red for malignant
+        chart.setBackgroundPaint(Color.white);
+
+        // Creates a ChartPanel to display the chart.
+        ChartPanel chartPanel = new ChartPanel(chart);
+        chartPanel.setPreferredSize(new Dimension(800, 600));
+        // Chart is being displayed. 
+        setContentPane(chartPanel);
+    }
+
+    private DefaultPieDataset createDataset() 
+    {
+    	// Will hold the data for the pie chart.
+        DefaultPieDataset dataset = new DefaultPieDataset();
+
+        int benignCount = 0;
+        int malignantCount = 0;
+
+        String zipFilePath = "C:\\Users\\Vrinda\\Downloads\\breast+cancer+wisconsin+original.zip";
+
+        // Opens the ZIP file specified by zipFilePath in a try-with-resources block to ensure it is closed automatically.
+        try (ZipFile zipFile = new ZipFile(zipFilePath)) 
+        {
+        	// Retrieves an enumeration of the entries (files) in the ZIP file.
+            Enumeration<? extends ZipEntry> entries = zipFile.entries();
+            // Iterates through each entry in the ZIP file.
+            while (entries.hasMoreElements()) 
+            {
+                ZipEntry entry = entries.nextElement();
+                // Checks if the entry's name ends with ".csv" to identify the CSV file.
+                if (entry.getName().endsWith(".csv")) 
+                {
+                	// Opens the CSV file entry in the ZIP file using a BufferedReader for reading text.
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(zipFile.getInputStream(entry)))) {
+                        // Hold each line read from the file.
+                    	String line;
+                        br.readLine(); // Skip header line
+                        // Reads each subsequent line in the file until the end.
+                        while ((line = br.readLine()) != null) 
+                        {
+                        	// Splits the line into an array of strings using commas as delimiters.
+                            String[] data = line.split(",");
+                            if (data.length > 0) 
+                            {
+                            	// Checks if the array is non-empty and retrieves the last element. 
+                                String classLabelStr = data[data.length - 1].trim();
+                                if (!classLabelStr.isEmpty()) 
+                                {
+                                	// Attempts to parse the class label string into an integer.
+                                    try 
+                                    {
+                                        int classLabel = Integer.parseInt(classLabelStr);
+                                        if (classLabel == 2) 
+                                        {
+                                            benignCount++;
+                                        } 
+                                        else if (classLabel == 4) 
+                                        {
+                                            malignantCount++;
+                                        }
+                                    } 
+                                    // Logs an error message.
+                                    catch (NumberFormatException e) 
+                                    {
+                                        // Log and ignore lines with invalid numbers
+                                        System.err.println("Invalid number format in line: " + line);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break; 
+                }
+            }
+        } 
+        // Prints the stack trace and shows an error message dialog. 
+        catch (IOException e) 
+        {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error reading file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+
+        // Add data to the dataset
+        dataset.setValue("Benign", benignCount);
+        dataset.setValue("Malignant", malignantCount);
+
+        return dataset;
+    }
+
+    public static void main(String[] args) 
+    {
+    	// GUI is created using lambda expression. 
+        SwingUtilities.invokeLater(() -> 
+        {
+        	
+            PieChart example = new PieChart("Wisconsin Breast Cancer Tumours");
+            example.setSize(800, 600);
+            // Centers the frame on the screen.
+            example.setLocationRelativeTo(null);
+            // Application will terminate when the user closes the frame.
+            example.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            // This makes the frame visible.
+            example.setVisible(true);
+        }
+        );
+    }
+}
