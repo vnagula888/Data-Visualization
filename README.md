@@ -8,9 +8,9 @@ I visualized the findings from the University of Wisconsin-Madison's breast canc
 # Code Overview
 The project consists of the following key components:
 
-PieChart class: Extends JFrame to create a window for displaying the pie chart.
-createDataset method: Reads the ZIP file, processes the CSV data, and creates a dataset for the pie chart.
-main method: Sets up the GUI and displays the pie chart.
+1. PieChart class: Extends JFrame to create a window for displaying the pie chart.
+2. createDataset method: Reads the ZIP file, processes the CSV data, and creates a dataset for the pie chart.
+3. main method: Sets up the GUI and displays the pie chart.
 
 # Visualizations
 The main output of this project is a pie chart, which is generated based on the research data. The chart provides a clear visual representation of the proportion of benign and malignant tumor cases among females.
